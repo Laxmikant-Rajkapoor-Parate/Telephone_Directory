@@ -8,20 +8,22 @@ enum Color {red, black};
 class node {
   public :
     // for persons info
-    string name;
+    string name, email;
     long long mob_number;
+
     // for node info
     node *parent, *left, *right;
     bool color;
 
     // constructor...
-    node (string R_name, long long R_mob_number);
+    node (string R_name, long long R_mob_number, string R_email);
 };
 
-node :: node (string R_name, long long R_mob_number) {
+node :: node (string R_name, long long R_mob_number, string R_email) {
     // initialize the basic info
     name = R_name;
     mob_number = R_mob_number;
+    email = R_email;
     // all pointers are initialized to NULL
     // color by default is set to red; can change in future
     parent = left = right = NULL;
@@ -47,9 +49,9 @@ class RedBlackTree {
     void Insert (node *&newNode);
     // after insertion validate function is called
     // to search the number
-    node* Search (node *root, long long key);
+    node* Search (node *root, string key);
     // to modify the records
-    void Modify (long long key);
+    void Modify (string key);
     // to print all records
     void printDirectory(node *root);
 };
@@ -67,7 +69,7 @@ node* insertLikeBST (node *root, node *newNode) {
         return newNode;
     }
     // if number is greater than root's number
-    if (newNode->mob_number > root->mob_number) {
+    if (newNode->name > root->name) {
         // move towards right side
         root->right = insertLikeBST (root->right, newNode);
         root->right->parent = root;
@@ -219,13 +221,13 @@ void RedBlackTree :: rotateRight (node *&root, node *&newNode) {
 }
 
 // searches the number and returns the node
-node* RedBlackTree :: Search (node *root, long long key) {
+node* RedBlackTree :: Search (node *root, string key) {
     // implemented recurcively
     // searching in RBTree is like BST
-    if ((root == NULL) || (root->mob_number == key)) {
+    if ((root == NULL) || (root->name == key)) {
         return root;
     }
-    else if (root->mob_number > key) {
+    else if (root->name > key) {
         return (Search(root->left, key));
     }
     else {
@@ -235,8 +237,9 @@ node* RedBlackTree :: Search (node *root, long long key) {
 }
 
 // to modify records
-void RedBlackTree :: Modify (long long key) {
-    string n;  // to store new name
+void RedBlackTree :: Modify (string key) {
+    long long n;  // to store new number
+    string e;
     // a dummy node to store search results
     node *dummy = Search (root, key);
     if ( !dummy ) {
@@ -245,12 +248,16 @@ void RedBlackTree :: Modify (long long key) {
     }
     else {
         cout << "\n  Record found!!!";
-        cout << "\n  Enter the new Name : ";
+        cout << "\n  Enter the new number : ";
         cin >> n;
-        dummy->name = n;
+        dummy->mob_number = n;
+        cout << "\n  Enter the new email : ";
+        cin >> e;
+        dummy->email = e;
         cout << "\n  After modifying : ";
         cout << "\n  Name : " << dummy->name;
-        cout << "\n  Number : " << dummy->mob_number << endl;
+        cout << "\n  Number : " << dummy->mob_number;
+        cout << "\n  Email : " << dummy->email << endl;
     }
 }
 
@@ -258,7 +265,7 @@ void RedBlackTree :: Modify (long long key) {
 void RedBlackTree :: printDirectory(node *r) {
     if (r) {
         printDirectory (r->left);
-        cout << "\n\t" << r->name << "\t\t" << r->mob_number;
+        cout << "\n\t" << r->name << "\t\t" << r->mob_number << "\t\t" << r->email;
         printDirectory (r->right);
     }
 }
@@ -281,7 +288,7 @@ int main () {
     // creating an object of class
     RedBlackTree obj;
     // to take entries of names and numbers
-    string name;
+    string name, email;
     long long number;
     node *dummy, *searchResult;
     // the loop goes here
@@ -289,19 +296,21 @@ int main () {
         switch (menu()) {
             case 1 :
                 cout << "\n  Enter the Name : ";
-                cin >> name;
+                getline(cin, name);
                 cout << "  Enter the Number : ";
                 cin >> number;
+                cout << "  Enter the Email : ";
+                cin >> email;
                 // creating a node
-                dummy = new node(name, number);
+                dummy = new node(name, number, email);
                 obj.Insert (dummy);
                 // node is inserted
                 break;
             case 2 :
                 cout << "\n  Enter the number to search : ";
-                cin >> number;
+                cin >> name;
                 // reusing the variables
-                searchResult = obj.Search (obj.root, number);
+                searchResult = obj.Search (obj.root, name);
                 // search is successful is searchResult is not NULL
                 if ( !searchResult ) {
                     cout << "\n  Alert!!!"
@@ -310,17 +319,18 @@ int main () {
                 else {
                     cout << "\n  Record found!!!";
                     cout << "\n  Name : " << searchResult->name;
-                    cout << "\n  Number : " << searchResult->mob_number << endl;
+                    cout << "\n  Number : " << searchResult->mob_number;
+                    cout << "\n  Email : " << searchResult->email << endl;
                 }
                 break;
             case 3 : 
-                cout << "\n  Enter the number : ";
-                cin >> number;
-                obj.Modify(number);
+                cout << "\n  Enter the name : ";
+                cin >> name;
+                obj.Modify(name);
                 break;
             case 4 :
                 if (obj.root) {
-                    cout << "\n\tName\t\tNumber" << endl;
+                    cout << "\n\tName\t\tNumber\t\tEmail" << endl;
                     obj.printDirectory(obj.root);
                 }
                 else {
